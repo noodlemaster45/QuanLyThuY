@@ -2,6 +2,7 @@ from keras.models import load_model  # TensorFlow is required for Keras to work
 import cv2  # Install opencv-python
 import numpy as np
 def initCam():
+    
     img_path = "images/"
     img_counter = 0 
     # Disable scientific notation for clarity
@@ -42,7 +43,8 @@ def initCam():
         print("Class:", class_name[2:],end ="")
         print("Confidence Score:", str(np.round(confidence_score * 100))[:-2], "%")
         
-        img_name = class_name[2:].strip()+str(img_counter)
+        class_name = class_name[2:].strip()
+        img_name = class_name.strip()+str(img_counter)
         
         # Listen to the keyboard for presses.
         keyboard_input = cv2.waitKey(1)
@@ -57,7 +59,9 @@ def initCam():
             # img = cv2.imread(img_name)
             # cv2.imshow("picture",img)
             img_counter += 1
+            
             break
-
     camera.release()
     cv2.destroyAllWindows()
+    return img_name, class_name
+   

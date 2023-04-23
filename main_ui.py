@@ -7,10 +7,16 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtGui import QPixmap
 import modelcv as cv
-
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
+        class_names_list = open("converted_keras\labels.txt", "r").readlines()
+        for i in range(len(class_names_list)):
+            name = class_names_list[i]
+            name = name[2:]
+            name = name.strip()
+            class_names_list[i] = name
         Dialog.setObjectName("Dialog")
         Dialog.resize(788, 585)
         self.label = QtWidgets.QLabel(parent=Dialog)
@@ -100,7 +106,7 @@ class Ui_Dialog(object):
         self.tn_camBtn = QtWidgets.QPushButton(parent=self.tiepNhanPage)
         self.tn_camBtn.setGeometry(QtCore.QRect(340, 140, 75, 23))
         self.tn_camBtn.setObjectName("tn_camBtn")
-        self.tn_camBtn.clicked.connect(lambda: cv.initCam())
+        self.tn_camBtn.clicked.connect(lambda: settcImg())
         self.tn_addBtn = QtWidgets.QPushButton(parent=self.tiepNhanPage)
         self.tn_addBtn.setGeometry(QtCore.QRect(250, 140, 75, 23))
         self.tn_addBtn.setObjectName("tn_addBtn")
@@ -113,13 +119,24 @@ class Ui_Dialog(object):
         self.label_12.setGeometry(QtCore.QRect(0, 0, 221, 171))
         self.label_12.setText("")
         self.label_12.setScaledContents(True)
-        self.label_12.setObjectName("tn_imgLabel")
+        self.label_12.setObjectName("label_12")
+        
         self.loaiThuCB = QtWidgets.QComboBox(parent=self.tiepNhanPage)
         self.loaiThuCB.setGeometry(QtCore.QRect(90, 110, 131, 22))
         self.loaiThuCB.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.loaiThuCB.setEditable(False)
         self.loaiThuCB.setCurrentText("")
         self.loaiThuCB.setObjectName("loaiThuCB")
+        self.loaiThuCB.addItems(class_names_list)
+        
+        # chụp hình rồi lưu vào thư mục folder, up lên giao diện 
+        # initCam() return 2 giá trị: 0 = tên file ảnh, 1 = tên động vật được nhận dạng
+        def settcImg():
+            img_name = cv.initCam()
+            pixmap = QPixmap(img_name[0])
+            self.label_12.setPixmap(pixmap) 
+            self.loaiThuCB.setCurrentText(img_name[1])
+            
         self.label_7 = QtWidgets.QLabel(parent=self.tiepNhanPage)
         self.label_7.setGeometry(QtCore.QRect(10, 110, 81, 16))
         self.label_7.setObjectName("label_7")
@@ -145,6 +162,12 @@ class Ui_Dialog(object):
         self.gridLayout.setObjectName("gridLayout")
         self.tc_camBtn = QtWidgets.QPushButton(parent=self.frame_2)
         self.tc_camBtn.setObjectName("tc_camBtn")
+        self.tc_camBtn.clicked.connect(lambda: tc_settcImg())
+        def tc_settcImg():
+            img_name = cv.initCam()
+            pixmap = QPixmap(img_name[0])
+            self.label_13.setPixmap(pixmap) 
+            self.tc_loaiThuCB.setCurrentText(img_name[1])
         self.gridLayout.addWidget(self.tc_camBtn, 0, 0, 1, 1)
         self.tc_confirmBtn = QtWidgets.QPushButton(parent=self.frame_2)
         self.tc_confirmBtn.setObjectName("tc_confirmBtn")
@@ -154,11 +177,19 @@ class Ui_Dialog(object):
         self.tc_camFrm.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
         self.tc_camFrm.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.tc_camFrm.setObjectName("tc_camFrm")
+        self.tc_loaiThuCB = QtWidgets.QComboBox(parent=self.frame_2)
+        self.gridLayout.addWidget(self.tc_loaiThuCB, 2, 0, 1, 1)
+        self.tc_loaiThuCB.setGeometry(QtCore.QRect(90, 110, 131, 22))
+        self.tc_loaiThuCB.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+        self.tc_loaiThuCB.setEditable(False)
+        self.tc_loaiThuCB.setCurrentText("")
+        self.tc_loaiThuCB.setObjectName("tc_loaiThuCB")
+        self.tc_loaiThuCB.addItems(class_names_list)
         self.label_13 = QtWidgets.QLabel(parent=self.tc_camFrm)
         self.label_13.setGeometry(QtCore.QRect(0, 0, 201, 171))
         self.label_13.setText("")
         self.label_13.setScaledContents(True)
-        self.label_13.setObjectName("label_13")
+        self.label_13.setObjectName("tc_imLabel")
         self.stackedWidget.addWidget(self.page)
         self.page_2 = QtWidgets.QWidget()
         self.page_2.setObjectName("page_2")
@@ -271,7 +302,7 @@ class Ui_Dialog(object):
         self.tn_addBtn.setText(_translate("Dialog", "Xác nhận"))
         self.label_7.setText(_translate("Dialog", "Loài thú cưng"))
         self.tc_camBtn.setText(_translate("Dialog", "Chụp hình"))
-        self.tc_confirmBtn.setText(_translate("Dialog", "Xác nhận sửa hình"))
+        self.tc_confirmBtn.setText(_translate("Dialog", "Xác nhận sửa"))
         self.label_8.setText(_translate("Dialog", "Số điện thoại:"))
         self.label_9.setText(_translate("Dialog", "CCCD:"))
         self.label_10.setText(_translate("Dialog", "Họ tên:"))
@@ -283,7 +314,8 @@ class Ui_Dialog(object):
         self.label_18.setText(_translate("Dialog", "Mã khách hàng:"))
         self.label_19.setText(_translate("Dialog", "VND"))
 
-
+   
+    
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
